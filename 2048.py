@@ -19,7 +19,7 @@ class Grid():
 
 
     def createGrid(self, row, col):             #Creates the grid, where there are a row number of lists, each with a length of col.All elements of the data structure are 0
-        return [col*[0] for x in range(row)]    
+        return [col*[0] for x in range(row)]
 
     def assignRandCell(self, init=False):
         if len(self.emptiesSet):
@@ -57,166 +57,162 @@ class Grid():
 
     def collapsible(self): #This method returns True if the grid can be collapsed in any of the four directions. Otherwise, False will be returned
         collapse = False
-        
-        for values in range(self.col*self.row):  
-            row_num = values // self.row           #finds the row index and column index of a tile based of the tiles value (value is a number between 0 and (self.col*self.row - 1)) 
-            col_num = values % self.col            
+
+        for values in range(self.col*self.row):
+            row_num = values // self.row           #finds the row index and column index of a tile based of the tiles value (value is a number between 0 and (self.col*self.row - 1))
+            col_num = values % self.col
             tile = self.grid[row_num][col_num]
-            
+
             col_next = col_num + 1                 #finds the next column and row indeces of tiles current column and row indeces
             row_next = row_num + 1
-                        
+
             if self.grid[row_num][col_num] == 0:   #grid is collapsable if a tile in the grid has the value 0
                 collapse = True
-            
-            elif (col_num < self.col - 1 and self.grid[row_num][col_next] == tile): #grid is collapsable if two consecutive horizontal tiles have the same value 
-                collapse = True                                                    
-                
-            elif (row_num < self.row - 1 and self.grid[row_next][col_num] == tile): #grid is collapsable if two consecutive vertical tiles have the same value 
-                collapse = True                                                     
+
+            elif (col_num < self.col - 1 and self.grid[row_num][col_next] == tile): #grid is collapsable if two consecutive horizontal tiles have the same value
                 collapse = True
-            
-        return collapse                          
+
+            elif (row_num < self.row - 1 and self.grid[row_next][col_num] == tile): #grid is collapsable if two consecutive vertical tiles have the same value
+                collapse = True
+                collapse = True
+
+        return collapse
 
     def collapseRow(self, lst):     #This method returns a LEFT-collapsed list. It also returns True if the list was collapsed or False if it was not.
         collapse = False
-        temp_lst = []       
+        temp_lst = []
         original_len = len(lst)     #records the original length of list
-        
+
         for value in lst:           #creates a new list called temp_lst identical to lst
             temp_lst.append(value)
-        
+
         while 0 in lst:             #removes all the 0s in lst
             lst.remove(0)
-            
+
         new_len = len(lst)          #records the length of lst after the 0s have been removed
-    
+
         for value in range(new_len):# If two tiles beside each other are equivalent, the value of the leftmost of the two tiles becomes the addition of the two tiles, and the rightmost tile becomes 0
             cell_next = value + 1
             if value < new_len - 1:
-                if lst[value] == lst[cell_next]: 
+                if lst[value] == lst[cell_next]:
                     collapse = True
                     lst[value] += lst[cell_next]
                     lst[cell_next] = 0
                     self.score = self.score + lst[value]    #increments the score by a number equivalent to the addition of two equivalent added cells
-        
+
         while 0 in lst:             #removes all 0s in lst
             lst.remove(0)
-        
+
         add_len = original_len - len(lst) #finds difference in length between original lst and current lst
-        
+
         for values in range(add_len):#appends 0s to lst until lst has the same length has it originally did
-            lst.append(0)  
-        
+            lst.append(0)
+
         if temp_lst != lst:  #determines if the list was collapsed
             collapse = True
-        
+
         return lst,collapse
-    
+
     def collapseLeft(self): #This method collapses the grid to the left, and returns True if the grid was collapsed or False if it was not.
         collapse = False
         new_grid = []
-        
+
         for values in self.grid:    #creates a new grid with all rows collapsed to the left using collapseRow()
             new_lst,collapse = self.collapseRow(values)
             new_grid.append(new_lst)
-            
+
         self.grid = new_grid #assigns self.grid to new_grid
-            
+
         return collapse
 
     def collapseRight(self): #This method collapses the grid to the right, and returns True if the grid was collapsed or False if it was not.
         collapse = False
         new_grid = []
-        
+
         for values in self.grid:
             values.reverse()                            #reverses rows in self.grid
             new_lst,collapse = self.collapseRow(values) #collapses rows to the left using self.grid
             new_lst.reverse()                           #reverses rows again
             new_grid.append(new_lst)                    #appends collapsed rows to a new grid
-            
-        
+
+
         self.grid = new_grid #assigns self.grid to new_grid
-        
+
         return collapse
 
     def collapseUp(self): #This method collapses the grid upwards, and returns True if the grid was collapsed or False if it was not.
         new_grid = []
         count = 0
-        
-        for value in range(self.row): #creates lists of all the columns in the grid and appends to new_grid
-            temp_grid = []
-            for value in self.grid:             
-                temp_grid.append(value[count])
-            count += 1
-            new_grid.append(temp_grid)          
-        
-        intermediate_grid = []
-        
-        for values in new_grid: #collapses the columns using collapseRow() and appends the collapses column lists to intermediate_grid
-            temp_lst, collapse = self.collapseRow(values)
-            intermediate_grid.append(temp_lst)
-    
-        count = 0
-        final_grid = []
-        
-        for items in range(self.row): #transforms collapsed column lists back into original grid format using final_grid
-            temp_lst = []
-            for values in intermediate_grid: 
-                temp_lst.append(values[count])
-            final_grid.append(temp_lst)      
-            count += 1
-        
-        self.grid = final_grid #assigns self.grid to final_grid
-        
-        return collapse
 
-    def collapseDown(self): #This method collapses the grid downards, and returns True if the grid was collapsed or False if it was not.
-        new_grid = []
-        count = 0
-        
         for value in range(self.row): #creates lists of all the columns in the grid and appends to new_grid
             temp_grid = []
             for value in self.grid:
                 temp_grid.append(value[count])
             count += 1
-            new_grid.append(temp_grid) 
-        
+            new_grid.append(temp_grid)
+
         intermediate_grid = []
-        
+
         for values in new_grid: #collapses the columns using collapseRow() and appends the collapses column lists to intermediate_grid
             temp_lst, collapse = self.collapseRow(values)
             intermediate_grid.append(temp_lst)
-            
-        for values in intermediate_grid: #removes 0s from end of lists, and inserts them at beginning of lists
-            while 0 in values:
-                values.remove(0)
-            while len(values) < self.col:
-                values.insert(0,0)
-    
+
         count = 0
         final_grid = []
-        
+
         for items in range(self.row): #transforms collapsed column lists back into original grid format using final_grid
             temp_lst = []
             for values in intermediate_grid:
                 temp_lst.append(values[count])
             final_grid.append(temp_lst)
             count += 1
-        
+
         self.grid = final_grid #assigns self.grid to final_grid
-        return collapse        
+
+        return collapse
+
+    def collapseDown(self): #This method collapses the grid downards, and returns True if the grid was collapsed or False if it was not.
+        new_grid = []
+        count = 0
+
+        for value in range(self.row): #creates lists of all the columns in the grid and appends to new_grid
+            temp_grid = []
+            for value in self.grid:
+                temp_grid.append(value[count])
+            count += 1
+            new_grid.append(temp_grid)
+
+        intermediate_grid = []
+
+        for values in new_grid: #collapses the columns using collapseRow() and appends the collapses column lists to intermediate_grid
+            temp_lst, collapse = self.collapseRow(values)
+            intermediate_grid.append(temp_lst)
+
+        for values in intermediate_grid: #removes 0s from end of lists, and inserts them at beginning of lists
+            while 0 in values:
+                values.remove(0)
+            while len(values) < self.col:
+                values.insert(0,0)
+
+        count = 0
+        final_grid = []
+
+        for items in range(self.row): #transforms collapsed column lists back into original grid format using final_grid
+            temp_lst = []
+            for values in intermediate_grid:
+                temp_lst.append(values[count])
+            final_grid.append(temp_lst)
+            count += 1
+
+        self.grid = final_grid #assigns self.grid to final_grid
+        return collapse
 
 class Game():
     def __init__(self, row=4, col=4, initial=2):
         self.game = Grid(row, col, initial)
         self.play()
 
-    def printPrompt(self): #The first 4 lines of this function were commented out upon the discretion of a TA to address the error: "TERM environment variable not set."
-        #if sys.platform == 'win32':
-            #os.system("cls")
-        #else:
-            #os.system("clear")
+    def printPrompt(self):
         print('Press "w", "a", "s", or "d" to move Up, Left, Down or Right respectively.')
         print('Enter "p" to quit.\n')
         self.game.drawGrid()
